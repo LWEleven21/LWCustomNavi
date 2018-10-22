@@ -48,13 +48,12 @@
 + (void)load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        SEL needSwizzleSelectors[4] = {
+        SEL needSwizzleSelectors[3] = {
             @selector(viewWillAppear:),
             @selector(viewDidLoad),
-            @selector(setTitle:),
-            @selector(viewDidAppear:)
+            @selector(viewDidAppear:),
         };
-        for (int i = 0; i < 4;  i++) {
+        for (int i = 0; i < 3;  i++) {
             SEL selector = needSwizzleSelectors[i];
             NSString *newSelectorStr = [NSString stringWithFormat:@"LW_%@", NSStringFromSelector(selector)];
             Method originMethod = class_getInstanceMethod(self, selector);
@@ -70,7 +69,9 @@
      而 UINavigationController 不需要重新这些方法
      */
     if ([self isMemberOfClass:UINavigationController.class]){return;}
+    self.titleText = self.title;
     if ([self canUpdateNavigationBar]) {
+        self.navigationController.navigationBar.hidden = YES;
         [self updateCustomNavi];
     }
     [self LW_viewWillAppear:animated];
@@ -88,15 +89,6 @@
         [self creatCustomNaviView];
     }
     [self LW_viewDidLoad];
-}
-#pragma mark - =======  LW_setTitle  =======
-- (void)LW_setTitle:(NSString *)title {
-    /*
-     由于 UINavigationController 也是继承与UIViewController
-     而 UINavigationController 不需要重新这些方法
-     */
-    if ([self isMemberOfClass:UINavigationController.class]){return;}
-    self.titleText = title;
 }
 #pragma mark - =======  LW_viewDidAppear  =======
 - (void)LW_viewDidAppear:(BOOL)animated {
@@ -126,10 +118,11 @@
 //导航栏背景颜色
 - (UIColor *)naviBGColor {
     UIColor * bgColor = (UIColor *)objc_getAssociatedObject(self, _cmd);
-    return bgColor ? bgColor : [UIColor whiteColor];
+    return bgColor ? bgColor : [UIColor colorWithRed:0.96862745098039215 green:0.96862745098039215 blue:0.96862745098039215 alpha: 0.80000000000000004];
 }
 - (void)setNaviBGColor:(UIColor *)naviBGColor {
     objc_setAssociatedObject(self, @selector(naviBGColor), naviBGColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    self.LWNaviBGView.backgroundColor = self.naviBGColor;
 }
 //导航栏透明度
 - (float)naviBGAlpha {
@@ -138,6 +131,12 @@
 }
 - (void)setNaviBGAlpha:(float)naviBGAlpha {
     objc_setAssociatedObject(self, @selector(naviBGAlpha), @(naviBGAlpha), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    self.LWNaviBGView.alpha = self.naviBGAlpha;
+    if (self.naviBGAlpha <= 0) {
+        self.LWNaviBGImageView.hidden = YES;
+    }else {
+        self.LWNaviBGImageView.hidden = NO;
+    }
 }
 //导航栏背景图片
 - (UIImage *)naviBGImage {
@@ -146,6 +145,7 @@
 }
 - (void)setNaviBGImage:(UIImage *)naviBGImage {
     objc_setAssociatedObject(self, @selector(naviBGImage), naviBGImage, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    self.LWNaviBGImageView.image = self.naviBGImage;
 }
 //标题
 - (NSString *)titleText {
@@ -154,6 +154,7 @@
 }
 - (void)setTitleText:(NSString *)titleText {
    objc_setAssociatedObject(self, @selector(titleText), titleText, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    self.LWTitleLabel.text = self.titleText;
 }
 //标题颜色
 - (UIColor *)titleColor {
@@ -162,6 +163,7 @@
 }
 - (void)setTitleColor:(UIColor *)titleColor {
     objc_setAssociatedObject(self, @selector(titleColor), titleColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    self.LWTitleLabel.textColor = self.titleColor;
 }
 //标题字体
 - (UIFont *)titleFont {
@@ -170,6 +172,7 @@
 }
 - (void)setTitleFont:(UIFont *)titleFont {
     objc_setAssociatedObject(self, @selector(titleFont), titleFont, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    self.LWTitleLabel.font = self.titleFont;
 }
 //左按钮图片
 - (UIImage *)leftImage {
@@ -178,6 +181,13 @@
 }
 - (void)setLeftImage:(UIImage *)leftImage {
     objc_setAssociatedObject(self, @selector(leftImage), leftImage, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if (self.leftImage) {
+        [self.LWLeftBtn setTitle:nil forState:UIControlStateNormal];
+        [self.LWLeftBtn setImage:self.leftImage forState:UIControlStateNormal];
+        [self.LWLeftBtn setImage:self.leftImage forState:UIControlStateHighlighted];
+    }else {
+        [self.LWLeftBtn setTitle:self.leftTitle forState:UIControlStateNormal];
+    }
 }
 //左按钮标题
 - (NSString *)leftTitle {
@@ -186,14 +196,16 @@
 }
 - (void)setLeftTitle:(NSString *)leftTitle {
     objc_setAssociatedObject(self, @selector(leftTitle), leftTitle, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self.LWLeftBtn setTitle:self.leftTitle forState:UIControlStateNormal];
 }
 //左按钮标题颜色
 - (UIColor *)leftColor {
     UIColor * leftColor = (UIColor *)objc_getAssociatedObject(self, _cmd);
-    return leftColor ? leftColor : [UIColor colorWithRed:0 green:0.478431 blue:1 alpha:1.0];
+    return leftColor ? leftColor : [UIColor colorWithRed:0 green:0.47843137254901963 blue:1 alpha:1.0];
 }
 - (void)setLeftColor:(UIColor *)leftColor {
     objc_setAssociatedObject(self, @selector(leftColor), leftColor,  OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self.LWLeftBtn setTitleColor:self.leftColor forState:UIControlStateNormal];
 }
 //左按钮隐藏
 - (BOOL)leftHidden {
@@ -202,6 +214,7 @@
 }
 - (void)setLeftHidden:(BOOL)leftHidden {
     objc_setAssociatedObject(self, @selector(leftHidden), @(leftHidden), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    self.LWLeftBtn.hidden = self.leftHidden;
 }
 //左按钮点击事件
 - (BtnOnClick)leftOnClick {
@@ -217,6 +230,13 @@
 }
 - (void)setRightImage:(UIImage *)rightImage {
    objc_setAssociatedObject(self, @selector(rightImage), rightImage, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if (self.rightImage) {
+        [self.LWRightBtn setTitle:nil forState:UIControlStateNormal];
+        [self.LWRightBtn setImage:self.rightImage forState:UIControlStateNormal];
+        [self.LWRightBtn setImage:self.rightImage forState:UIControlStateHighlighted];
+    }else {
+        [self.LWRightBtn setTitle:self.rightTitle forState:UIControlStateNormal];
+    }
 }
 //右按钮标题
 - (NSString *)rightTitle {
@@ -225,14 +245,16 @@
 }
 - (void)setRightTitle:(NSString *)rightTitle {
    objc_setAssociatedObject(self, @selector(rightTitle), rightTitle, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  [self.LWRightBtn setTitle:self.rightTitle forState:UIControlStateNormal];
 }
 //右按钮标题颜色
 - (UIColor *)rightColor {
     UIColor * rightColor = (UIColor *)objc_getAssociatedObject(self, _cmd);
-    return rightColor ? rightColor : [UIColor colorWithRed:0 green:0.478431 blue:1 alpha:1.0];
+    return rightColor ? rightColor : [UIColor colorWithRed:0 green:0.47843137254901963 blue:1 alpha:1.0];
 }
 - (void)setRightColor:(UIColor *)rightColor {
      objc_setAssociatedObject(self, @selector(rightColor), rightColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self.LWRightBtn setTitleColor:self.rightColor forState:UIControlStateNormal];
 }
 //右按钮隐藏
 - (BOOL)rightHidden {
@@ -241,6 +263,7 @@
 }
 - (void)setRightHidden:(BOOL)rightHidden {
     objc_setAssociatedObject(self, @selector(rightHidden), @(rightHidden), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    self.LWRightBtn.hidden = self.rightHidden;
 }
 //右按钮点击事件
 - (BtnOnClick)rightOnClick {
@@ -256,6 +279,13 @@
 }
 - (void)setBackGesture:(BOOL)backGesture {
     objc_setAssociatedObject(self, @selector(backGesture), @(backGesture), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if (self.backGesture) {
+        self.navigationController.interactivePopGestureRecognizer.enabled = YES;
+    }else {
+        if ([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
+            self.navigationController.interactivePopGestureRecognizer.enabled = NO;
+        }
+    }
 }
 //状态栏样式
 - (UIStatusBarStyle)statusStyle {
@@ -264,6 +294,12 @@
 }
 - (void)setStatusStyle:(UIStatusBarStyle)statusStyle {
     objc_setAssociatedObject(self, @selector(statusStyle), @(statusStyle), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    //设置状态栏样式
+    if (self.statusStyle == UIStatusBarStyleDefault) {
+        self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
+    }else {
+        self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
+    }
 }
 //细线隐藏
 - (BOOL)shadowHidden {
@@ -272,6 +308,13 @@
 }
 - (void)setShadowHidden:(BOOL)shadowHidden {
    objc_setAssociatedObject(self, @selector(shadowHidden), @(shadowHidden), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if (self.shadowHidden) {
+        self.LWShadowImage.hidden = YES;
+    }else {
+        self.LWShadowImage.hidden = NO;
+        self.LWNaviBGView.frame = CGRectMake(0,0,[LWCustomNavi screenWidth], [LWCustomNavi naviBarHeight] - 0.3);
+        self.LWNaviBGImageView.frame = self.LWNaviBGView.frame;
+    }
 }
 #pragma mark - =======  导航栏控件  =======
 //背景
@@ -382,7 +425,6 @@
         [self.LWLeftBtn setTitle:nil forState:UIControlStateNormal];
         [self.LWLeftBtn setImage:self.leftImage forState:UIControlStateNormal];
         [self.LWLeftBtn setImage:self.leftImage forState:UIControlStateHighlighted];
-
     }else {
         [self.LWLeftBtn setTitle:self.leftTitle forState:UIControlStateNormal];
     }
@@ -402,12 +444,8 @@
     self.LWNaviBGView.backgroundColor = self.naviBGColor;
     //设置背景图片
     self.LWNaviBGImageView.image = self.naviBGImage;
-    //设置透明度
-    if (self.naviBGColor == [UIColor whiteColor] && self.naviBGAlpha >= 1.0) {
-        self.naviBGAlpha = 0.5;
-    }
     self.LWNaviBGView.alpha = self.naviBGAlpha;
-    if (self.naviBGAlpha == 0) {
+    if (self.naviBGAlpha <= 0) {
         self.LWNaviBGImageView.hidden = YES;
     }
     //设置状态栏样式

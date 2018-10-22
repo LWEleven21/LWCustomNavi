@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		20093A55217DB54600497E54 /* ViewController3.m in Sources */ = {isa = PBXBuildFile; fileRef = 20093A54217DB54600497E54 /* ViewController3.m */; };
 		206A05FA217817FD00D4D024 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 206A05F9217817FD00D4D024 /* AppDelegate.m */; };
 		206A05FD217817FD00D4D024 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 206A05FC217817FD00D4D024 /* ViewController.m */; };
 		206A0600217817FD00D4D024 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 206A05FE217817FD00D4D024 /* Main.storyboard */; };
@@ -25,6 +26,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		20093A53217DB54600497E54 /* ViewController3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController3.h; sourceTree = "<group>"; };
+		20093A54217DB54600497E54 /* ViewController3.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController3.m; sourceTree = "<group>"; };
 		206A05F5217817FD00D4D024 /* LWCustomNavi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LWCustomNavi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		206A05F8217817FD00D4D024 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		206A05F9217817FD00D4D024 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -92,6 +95,8 @@
 				206A061E217853E000D4D024 /* imageNav.jpg */,
 				206A06152178351700D4D024 /* ViewController2.h */,
 				206A06162178351700D4D024 /* ViewController2.m */,
+				20093A53217DB54600497E54 /* ViewController3.h */,
+				20093A54217DB54600497E54 /* ViewController3.m */,
 				206A05FE217817FD00D4D024 /* Main.storyboard */,
 				206A0601217817FE00D4D024 /* Assets.xcassets */,
 				206A0603217817FE00D4D024 /* LaunchScreen.storyboard */,
@@ -189,6 +194,7 @@
 			files = (
 				206A05FD217817FD00D4D024 /* ViewController.m in Sources */,
 				206A06142178183A00D4D024 /* LWCustomNavi.m in Sources */,
+				20093A55217DB54600497E54 /* ViewController3.m in Sources */,
 				206A06172178351700D4D024 /* ViewController2.m in Sources */,
 				206A0608217817FE00D4D024 /* main.m in Sources */,
 				206A05FA217817FD00D4D024 /* AppDelegate.m in Sources */,

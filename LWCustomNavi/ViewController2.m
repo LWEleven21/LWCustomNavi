@@ -9,6 +9,8 @@
 #import "ViewController2.h"
 #import "LWCustomNavi.h"
 #import "ViewController.h"
+#import "ViewController3.h"
+
 @interface ViewController2 ()
 
 @end
@@ -17,20 +19,21 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor grayColor];
+    self.view.backgroundColor = [UIColor orangeColor];
     self.title = @"标题2";
     self.shadowHidden = YES;
     self.leftImage = [UIImage imageNamed:@"back"];
+    self.rightImage = [UIImage imageNamed:@"sckc"];
     self.statusStyle = 1;
     self.titleColor = [UIColor whiteColor];
     self.rightHidden = NO;
     __weak typeof(self) weakSelf = self;
     self.rightOnClick = ^{
-        [weakSelf presentViewController:[ViewController new] animated:YES completion:^{
-            
-        }];
+        [weakSelf.navigationController pushViewController:[ViewController3 new] animated:YES];
     };
 }
-
+-(void)dealloc {
+    NSLog(@"dealloc 2");
+}
 
 @end
